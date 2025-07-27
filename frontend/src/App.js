@@ -12,6 +12,7 @@ function App() {
           <Route path="/" element={<ShelfChef />} />
         </Routes>
       </BrowserRouter>
+      <Toaster />
     </div>
   );
 }
