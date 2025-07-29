@@ -15,6 +15,7 @@ class Recipe(BaseModel):
     missing_ingredients: List[str]
     instructions: List[str]
     match_percentage: int
+    image_url: str = ""
 
 class RecipeTemplate:
     def __init__(self, name: str, description: str, primary_ingredients: List[str], 
