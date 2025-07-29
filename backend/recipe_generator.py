@@ -19,7 +19,8 @@ class Recipe(BaseModel):
 class RecipeTemplate:
     def __init__(self, name: str, description: str, primary_ingredients: List[str], 
                  optional_ingredients: List[str], cook_time: str, servings: str, 
-                 difficulty: str, instructions_template: List[str], category: str = "main"):
+                 difficulty: str, instructions_template: List[str], category: str = "main",
+                 image_url: str = ""):
         self.name = name
         self.description = description
         self.primary_ingredients = primary_ingredients
@@ -29,6 +30,7 @@ class RecipeTemplate:
         self.difficulty = difficulty
         self.instructions_template = instructions_template
         self.category = category
+        self.image_url = image_url
 
 class SmartRecipeGenerator:
     def __init__(self):
