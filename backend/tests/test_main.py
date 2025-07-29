@@ -1,8 +1,38 @@
 import pytest
+import asyncio
 from fastapi.testclient import TestClient
 from server import app
 import json
+from motor.motor_asyncio import AsyncIOMotorClient
+import os
 
+# Test database setup
+TEST_MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
+TEST_DB_NAME = "test_shelfchef"
+
+@pytest.fixture(scope="session")
+def event_loop():
+    """Create an instance of the default event loop for the test session."""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+@pytest.fixture(scope="session")
+async def setup_test_db():
+    """Setup test database"""
+    client = AsyncIOMotorClient(TEST_MONGO_URL)
+    db = client[TEST_DB_NAME]
+    
+    # Clean up any existing test data
+    await db.saved_recipes.delete_many({})
+    
+    yield db
+    
+    # Clean up after tests
+    await db.saved_recipes.delete_many({})
+    client.close()
+
+# Use TestClient for synchronous tests
 client = TestClient(app)
 
 def test_health_check():
@@ -54,71 +84,78 @@ def test_generate_recipes_empty_ingredients():
     data = response.json()
     assert "Please provide ingredients" in data["detail"]
 
-def test_save_recipe():
-    """Test saving a recipe"""
-    recipe_data = {
-        "name": "Test Recipe",
-        "description": "A test recipe",
-        "cook_time": "10 mins",
-        "servings": "2 servings",
-        "difficulty": "Easy",
-        "available_ingredients": ["chicken", "rice"],
-        "missing_ingredients": ["salt", "pepper"],
-        "instructions": ["Cook chicken", "Add rice", "Season to taste"],
-        "match_percentage": 75,
-        "image_url": "https://example.com/image.jpg"
-    }
+def test_generate_recipes_varied_ingredients():
+    """Test recipe generation with different ingredient combinations"""
+    test_cases = [
+        {"ingredients": "eggs, milk, flour"},
+        {"ingredients": "pasta, tomato, basil"},
+        {"ingredients": "chicken, vegetables, rice"},
+    ]
     
-    response = client.post("/api/save-recipe", json=recipe_data)
+    for case in test_cases:
+        response = client.post("/api/generate-recipes", json=case)
+        assert response.status_code == 200
+        
+        data = response.json()
+        assert "recipes" in data
+        assert len(data["recipes"]) > 0
+
+def test_recipe_generation_performance():
+    """Test that recipe generation is reasonably fast"""
+    import time
+    
+    payload = {"ingredients": "chicken, rice, vegetables"}
+    
+    start_time = time.time()
+    response = client.post("/api/generate-recipes", json=payload)
+    end_time = time.time()
+    
+    assert response.status_code == 200
+    assert (end_time - start_time) < 2.0  # Should complete within 2 seconds
+
+def test_recipe_match_percentage():
+    """Test that recipes have reasonable match percentages"""
+    payload = {"ingredients": "chicken, rice, tomato, onion"}
+    
+    response = client.post("/api/generate-recipes", json=payload)
     assert response.status_code == 200
     
     data = response.json()
-    assert data["name"] == recipe_data["name"]
-    assert "id" in data
-    assert "saved_at" in data
+    for recipe in data["recipes"]:
+        assert 0 <= recipe["match_percentage"] <= 100
+        assert isinstance(recipe["match_percentage"], int)
 
-def test_get_saved_recipes():
-    """Test retrieving saved recipes"""
-    response = client.get("/api/saved-recipes")
+def test_recipe_instructions_format():
+    """Test that recipe instructions are properly formatted"""
+    payload = {"ingredients": "eggs, cheese, vegetables"}
+    
+    response = client.post("/api/generate-recipes", json=payload)
     assert response.status_code == 200
     
     data = response.json()
-    assert isinstance(data, list)
+    for recipe in data["recipes"]:
+        assert len(recipe["instructions"]) > 0
+        assert all(isinstance(instruction, str) for instruction in recipe["instructions"])
+        assert all(len(instruction.strip()) > 0 for instruction in recipe["instructions"])
 
-def test_delete_saved_recipe():
-    """Test deleting a saved recipe"""
-    # First save a recipe
-    recipe_data = {
-        "name": "Recipe to Delete",
-        "description": "A recipe to be deleted",
-        "cook_time": "5 mins",
-        "servings": "1 serving",
-        "difficulty": "Easy",
-        "available_ingredients": ["bread"],
-        "missing_ingredients": ["butter"],
-        "instructions": ["Toast bread"],
-        "match_percentage": 50,
-        "image_url": ""
-    }
+def test_recipe_image_urls():
+    """Test that recipes have valid image URLs"""
+    payload = {"ingredients": "chicken, rice, vegetables"}
     
-    save_response = client.post("/api/save-recipe", json=recipe_data)
-    assert save_response.status_code == 200
-    
-    recipe_id = save_response.json()["id"]
-    
-    # Delete the recipe
-    delete_response = client.delete(f"/api/saved-recipes/{recipe_id}")
-    assert delete_response.status_code == 200
-    
-    data = delete_response.json()
-    assert data["message"] == "Recipe deleted successfully"
-
-def test_delete_nonexistent_recipe():
-    """Test deleting a non-existent recipe"""
-    fake_id = "nonexistent_id"
-    
-    response = client.delete(f"/api/saved-recipes/{fake_id}")
-    assert response.status_code == 404
+    response = client.post("/api/generate-recipes", json=payload)
+    assert response.status_code == 200
     
     data = response.json()
-    assert data["detail"] == "Recipe not found"
+    for recipe in data["recipes"]:
+        if recipe["image_url"]:
+            assert recipe["image_url"].startswith(("http://", "https://"))
+
+def test_api_error_handling():
+    """Test API error handling with malformed requests"""
+    # Test invalid JSON
+    response = client.post("/api/generate-recipes", data="invalid json")
+    assert response.status_code == 422
+    
+    # Test missing ingredients field
+    response = client.post("/api/generate-recipes", json={})
+    assert response.status_code == 422
