@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shelfchef-backend
+  namespace: shelfchef
+  labels:
+    app: shelfchef-backend
+    version: v1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: shelfchef-backend
+  template:
+    metadata:
+      labels:
+        app: shelfchef-backend
+        version: v1
+    spec:
+      containers:
+      - name: backend
+        image: your-registry/shelfchef-backend:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: MONGO_URL
+          valueFrom:
+            secretKeyRef:
+              name: shelfchef-secrets
+              key: mongo-url
+        - name: DB_NAME
+          value: "shelfchef"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: shelfchef-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shelfchef-backend-service
+  namespace: shelfchef
+spec:
+  selector:
+    app: shelfchef-backend
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  type: ClusterIP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: shelfchef-ingress
+  namespace: shelfchef
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - api.shelfchef.com
+    secretName: shelfchef-tls
+  rules:
+  - host: api.shelfchef.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: shelfchef-backend-service
+            port:
+              number: 8000
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shelfchef-config
+  namespace: shelfchef
+data:
+  app.conf: |
+    [app]
+    name = shelfchef
+    environment = production
+    debug = false
+    
+    [database]
+    max_connections = 100
+    connection_timeout = 30
+    
+    [logging]
+    level = INFO
+    format = json
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: shelfchef-secrets
+  namespace: shelfchef
+type: Opaque
+data:
+  mongo-url: # base64 encoded MongoDB connection string
