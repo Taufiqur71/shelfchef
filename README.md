@@ -1,5 +1,12 @@
 # 🍳 ShelfChef - Smart Recipe Generator
 
+Transform your ingredients into amazing recipes with AI-powered suggestions!
+
+![ShelfChef](https://img.shields.io/badge/ShelfChef-Smart%20Recipe%20Generator-66BB6A?style=for-the-badge)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688?style=for-the-badge&logo=fastapi)
+![MongoDB](https://img.shields.io/badge/MongoDB-5.0-47A248?style=for-the-badge&logo=mongodb)
+
 ShelfChef is a modern web application that transforms your available ingredients into delicious recipes using intelligent algorithms. Built with React, FastAPI, and MongoDB.
 
 ## 🌟 Features
