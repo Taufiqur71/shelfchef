@@ -46,6 +46,7 @@ class SavedRecipe(BaseModel):
     missing_ingredients: List[str]
     instructions: List[str]
     match_percentage: int
+    image_url: str = ""
     saved_at: datetime = Field(default_factory=datetime.utcnow)
 
 class SavedRecipeCreate(BaseModel):
@@ -58,6 +59,7 @@ class SavedRecipeCreate(BaseModel):
     missing_ingredients: List[str]
     instructions: List[str]
     match_percentage: int
+    image_url: str = ""
 
 # API Routes
 @api_router.get("/")
