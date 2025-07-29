@@ -427,7 +427,8 @@ class SmartRecipeGenerator:
                 available_ingredients=available_ingredients,
                 missing_ingredients=missing_ingredients,
                 instructions=instructions,
-                match_percentage=final_match
+                match_percentage=final_match,
+                image_url=template.image_url
             )
             
             recipes.append(recipe)
