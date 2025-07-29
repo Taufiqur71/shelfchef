@@ -121,6 +121,25 @@ const ShelfChef = () => {
 
   const renderRecipeCard = (recipe, index, isSaved = false) => (
     <Card key={index} className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 rounded-2xl overflow-hidden">
+      {/* Recipe Image */}
+      {recipe.image_url && (
+        <div className="relative h-48 overflow-hidden">
+          <img
+            src={recipe.image_url}
+            alt={recipe.name}
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+          <div className="absolute top-4 right-4">
+            <Badge className="bg-white text-[#66BB6A] font-semibold text-sm px-3 py-1 shadow-md">
+              {recipe.match_percentage}% Match
+            </Badge>
+          </div>
+        </div>
+      )}
+      
       <CardHeader className="bg-gradient-to-r from-[#66BB6A] to-[#5aa85a] text-white p-6">
         <div className="flex items-center justify-between">
           <div>
@@ -129,11 +148,13 @@ const ShelfChef = () => {
               {recipe.description}
             </CardDescription>
           </div>
-          <div className="text-right">
-            <Badge className="bg-white text-[#66BB6A] font-semibold text-sm px-3 py-1">
-              {recipe.match_percentage}% Match
-            </Badge>
-          </div>
+          {!recipe.image_url && (
+            <div className="text-right">
+              <Badge className="bg-white text-[#66BB6A] font-semibold text-sm px-3 py-1">
+                {recipe.match_percentage}% Match
+              </Badge>
+            </div>
+          )}
         </div>
       </CardHeader>
       
