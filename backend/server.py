@@ -94,11 +94,11 @@ async def generate_recipes(request: RecipeGenerationRequest):
 async def save_recipe(recipe_data: SavedRecipeCreate):
     """Save a recipe to the database"""
     
-    saved_recipe = SavedRecipe(**recipe_data.dict())
+    saved_recipe = SavedRecipe(**recipe_data.model_dump())
     
     try:
         # Insert into MongoDB
-        await db.saved_recipes.insert_one(saved_recipe.dict())
+        await db.saved_recipes.insert_one(saved_recipe.model_dump())
         return saved_recipe
         
     except Exception as e:
