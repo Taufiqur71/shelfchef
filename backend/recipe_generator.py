@@ -46,7 +46,7 @@ class SmartRecipeGenerator:
         }
         
     def _create_recipe_templates(self) -> List[RecipeTemplate]:
-        """Create a comprehensive database of recipe templates"""
+        """Create a comprehensive database of recipe templates with food images"""
         return [
             RecipeTemplate(
                 name="Classic Omelet",
@@ -64,7 +64,8 @@ class SmartRecipeGenerator:
                     "Fold omelet in half and slide onto plate",
                     "Serve immediately while hot"
                 ],
-                category="breakfast"
+                category="breakfast",
+                image_url="https://images.unsplash.com/photo-1482049016688-2d3e1b311543?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHxmb29kfGVufDB8fHx8MTc1Mzc2NzU5MXww&ixlib=rb-4.1.0&q=85"
             ),
             RecipeTemplate(
                 name="Fried Rice",
@@ -84,7 +85,8 @@ class SmartRecipeGenerator:
                     "Stir-fry for 3-4 minutes until heated through",
                     "Garnish and serve hot"
                 ],
-                category="main"
+                category="main",
+                image_url="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwyfHxmb29kfGVufDB8fHx8MTc1Mzc2NzU5MXww&ixlib=rb-4.1.0&q=85"
             ),
             RecipeTemplate(
                 name="Garlic Bread",
@@ -103,7 +105,8 @@ class SmartRecipeGenerator:
                     "Bake for 8-10 minutes until golden and crispy",
                     "Serve warm"
                 ],
-                category="side"
+                category="side",
+                image_url="https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHw0fHxmb29kfGVufDB8fHx8MTc1Mzc2NzU5MXww&ixlib=rb-4.1.0&q=85"
             ),
             RecipeTemplate(
                 name="Pasta Primavera",
@@ -122,7 +125,8 @@ class SmartRecipeGenerator:
                     "Add {cheese} and seasonings",
                     "Serve immediately with extra cheese if desired"
                 ],
-                category="main"
+                category="main",
+                image_url="https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg"
             ),
             RecipeTemplate(
                 name="Chicken Stir-fry",
@@ -142,7 +146,8 @@ class SmartRecipeGenerator:
                     "Return chicken to pan and add sauce",
                     "Stir-fry for 2-3 minutes until heated through"
                 ],
-                category="main"
+                category="main",
+                image_url="https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHw0fHxjb29raW5nfGVufDB8fHx8MTc1MzcwMzQwNnww&ixlib=rb-4.1.0&q=85"
             ),
             RecipeTemplate(
                 name="Cheese Toast",
@@ -160,7 +165,8 @@ class SmartRecipeGenerator:
                     "Bake for 3-5 minutes until cheese melts",
                     "Serve hot"
                 ],
-                category="snack"
+                category="snack",
+                image_url="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg"
             ),
             RecipeTemplate(
                 name="Vegetable Soup",
@@ -179,7 +185,8 @@ class SmartRecipeGenerator:
                     "Season with salt and pepper to taste",
                     "Serve hot with bread if desired"
                 ],
-                category="soup"
+                category="soup",
+                image_url="https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwzfHxmb29kfGVufDB8fHx8MTc1Mzc2NzU5MXww&ixlib=rb-4.1.0&q=85"
             ),
             RecipeTemplate(
                 name="Grilled Cheese Sandwich",
@@ -198,7 +205,8 @@ class SmartRecipeGenerator:
                     "Cook until golden brown and cheese melts",
                     "Cut and serve hot"
                 ],
-                category="main"
+                category="main",
+                image_url="https://images.unsplash.com/photo-1466637574441-749b8f19452f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHwzfHxjb29raW5nfGVufDB8fHx8MTc1MzcwMzQwNnww&ixlib=rb-4.1.0&q=85"
             )
         ]
     
